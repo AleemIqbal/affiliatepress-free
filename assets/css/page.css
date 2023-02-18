@@ -1,0 +1,46 @@
+@import "./parts/sidebar.css";
+@import "./parts/widget-search.css";
+.wp-caption {
+  /* add styles here */
+}
+
+.wp-caption-text {
+  /* add styles here */
+}
+
+.sticky {
+  /* add styles here */
+}
+
+.gallery-caption {
+  /* add styles here */
+}
+
+.bypostauthor {
+  /* add styles here */
+}
+.wp-block-button__link {
+  border-radius: 5px;
+  font-size: 16px;
+  padding: 8px 30px;
+  background-color: var(--white);
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: 0 5px 0 0 var(--primary);
+  margin-bottom: 5px;
+}
+.wp-block-button__link:hover {
+  background-color: #ececec;
+  text-decoration: none;
+}
+.wp-block-button__link:active {
+  transform: translateY(5px);
+  box-shadow: 0 0 0 0 var(--primary);
+}
+.wp-block-button__link:active,
+.wp-block-button__link:focus,
+.wp-block-button__link:hover,
+.wp-block-button__link:visited {
+  color: var(--primary);
+}
