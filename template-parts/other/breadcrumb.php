@@ -10,7 +10,7 @@ if (is_single() || is_page() || is_author() || is_category()) : ?>
             </li>
             <?php if (is_single()) : ?>
                 <li class="breadcrumb__list-item" property="itemListElement" typeof="ListItem">
-                    <?php the_svg("chevron_right") ?>
+                    <?php affiliatepress_the_svg("chevron_right") ?>
                     <a class="breadcrumb__list-item__link" property="item" typeof="WebPage" href="<?php echo get_category_link(get_the_category()[0]->term_id) ?>">
                         <span class="breadcrumb__list-item__name" property="name"><?php echo get_the_category()[0]->name ?></span>
                     </a>
@@ -18,7 +18,7 @@ if (is_single() || is_page() || is_author() || is_category()) : ?>
                 </li>
             <?php endif; ?>
             <li class="breadcrumb__list-item" property="itemListElement" typeof="ListItem">
-                <?php the_svg("chevron_right") ?>
+                <?php affiliatepress_the_svg("chevron_right") ?>
                 <span class="breadcrumb__list-item__name" property="name"><?php (is_single() || is_page()) ? the_title() : (is_category() ? single_cat_title() : the_author()) ?></span>
                 <meta property="position" content="<?php echo (is_single() ? '3' : '2') ?>">
             </li>

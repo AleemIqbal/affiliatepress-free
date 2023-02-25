@@ -2,7 +2,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-function custom_add_featured_category_field($term)
+function affiliatepress_add_featured_category_field($term)
 {
     wp_nonce_field('category_meta_edit', 'category_meta_edit_nonce');
 ?>
@@ -19,9 +19,9 @@ function custom_add_featured_category_field($term)
 <?php
 }
 
-add_action('category_add_form_fields', 'custom_add_featured_category_field');
+add_action('category_add_form_fields', 'affiliatepress_add_featured_category_field');
 
-function custom_edit_featured_category_field($term)
+function affiliatepress_edit_featured_category_field($term)
 {
     wp_nonce_field('category_meta_edit', 'category_meta_edit_nonce');
     $home_featured = get_term_meta($term->term_id, '_home_featured', true);
@@ -49,10 +49,10 @@ function custom_edit_featured_category_field($term)
 <?php
 }
 
-add_action('category_edit_form_fields', 'custom_edit_featured_category_field');
+add_action('category_edit_form_fields', 'affiliatepress_edit_featured_category_field');
 
 // Save the field
-function custom_save_tax_meta($term_id)
+function affiliatepress_save_tax_meta($term_id)
 {
     if (!wp_verify_nonce($_POST['category_meta_edit_nonce'], 'category_meta_edit')) return;
 
@@ -61,20 +61,20 @@ function custom_save_tax_meta($term_id)
 }
 
 // save_tax_meta
-add_action('created_category', 'custom_save_tax_meta', 10, 2);
-add_action('edited_category', 'custom_save_tax_meta', 10, 2);
+add_action('created_category', 'affiliatepress_save_tax_meta', 10, 2);
+add_action('edited_category', 'affiliatepress_save_tax_meta', 10, 2);
 
 
 // Add column to Category list
-function custom_featured_category_columns($columns)
+function affiliatepress_featured_category_columns($columns)
 {
     return array_merge($columns, array('featured' =>  __('Home Featured' , 'affiliatepress')));
 }
 
-add_filter('manage_edit-category_columns', 'custom_featured_category_columns');
+add_filter('manage_edit-category_columns', 'affiliatepress_featured_category_columns');
 
 // Add the value to the column
-function custom_featured_category_columns_values($deprecated, $column_name, $term_id)
+function affiliatepress_featured_category_columns_values($deprecated, $column_name, $term_id)
 {
     if ($column_name === 'featured') {
         $home_featured = get_term_meta($term_id, '_home_featured', true);
@@ -85,4 +85,4 @@ function custom_featured_category_columns_values($deprecated, $column_name, $ter
         }
     }
 }
-add_action('manage_category_custom_column', 'custom_featured_category_columns_values', 10, 3);
+add_action('manage_category_custom_column', 'affiliatepress_featured_category_columns_values', 10, 3);

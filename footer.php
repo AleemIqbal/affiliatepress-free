@@ -2,7 +2,7 @@
 </div>
 </div>
 </div>
-<footer class="footer" id="colophon" itemtype="https://schema.org/WPFooter" itemscope itemid="#colophon">
+<footer class="footer" id="colophon" itemtype="https://schema.org/WPFooter" itemscope itemid="#colophon" tabindex="-1">
     <div class="container">
         <div class="footer__inner">
             <?php
@@ -29,32 +29,34 @@
 
                 if (!empty($youtube_link)) { ?>
                     <a href="<?php echo $youtube_link ?>" class="footer__social-icon youtube" target="_blank" rel="follow external noopener noreferrer">
-                        <?php the_svg("youtube") ?>
+                        <?php affiliatepress_the_svg("youtube") ?>
                     </a>
                 <?php }
                 if (!empty($facebook_link)) { ?>
                     <a href="<?php echo $facebook_link ?>" class="footer__social-icon facebook" target="_blank" rel="follow external noopener noreferrer">
-                        <?php the_svg("facebook") ?>
+                        <?php affiliatepress_the_svg("facebook") ?>
                     </a>
                 <?php }
                 if (!empty($twitter_link)) { ?>
                     <a href="<?php echo $twitter_link ?>" class="footer__social-icon twitter" target="_blank" rel="follow external noopener noreferrer">
-                        <?php the_svg("twitter") ?>
+                        <?php affiliatepress_the_svg("twitter") ?>
                     </a>
                 <?php }
                 if (!empty($tumblr_link)) { ?>
                     <a href="<?php echo $tumblr_link ?>" class="footer__social-icon tumblr" target="_blank" rel="follow external noopener noreferrer">
-                        <?php the_svg("tumblr") ?>
+                        <?php affiliatepress_the_svg("tumblr") ?>
                     </a>
                 <?php }
                 if (!empty($linkedin_link)) { ?>
                     <a href="<?php echo $linkedin_link ?>" class="footer__social-icon linkedin" target="_blank" rel="follow external noopener noreferrer">
-                        <?php the_svg("linkedin") ?>
+                        <?php affiliatepress_the_svg("linkedin") ?>
                     </a>
                 <?php } ?>
             </div>
             <div class="footer__menu">
+            <?php if (has_nav_menu("footer_menu")): ?>
                 <?php wp_nav_menu(array('theme_location' => "footer_menu")) ?>
+            <?php endif; ?>
             </div>
             <div class="footer__copyright">
                 <?php
@@ -70,7 +72,9 @@
 $theme = wp_get_theme();
 $author_url = $theme->get( 'AuthorURI' );
 $author = $theme->get( 'Author' );
-$copyright_text = get_theme_mod( 'setting_copyright_text', sprintf( '%%site_title%% © %%current_year%%. All rights reserved. Designed By <a href="%s" target="_blank">%s</a>.', $author_url, $author ) );
+$current_year = date( 'Y' );
+$site_title = get_bloginfo( 'name' );
+$copyright_text = get_theme_mod( 'setting_copyright_text', sprintf( '%s © %s. All rights reserved. Designed By <a href="%s" target="_blank">%s</a>.', $site_title, $current_year, $author_url, $author ) );
                 $searchVal = array("%%site_title%%", "%%current_year%%");
                 $replaceVal = array(get_bloginfo('name'), date("Y"));
                 $result = str_replace($searchVal, $replaceVal, $copyright_text); ?>
@@ -86,7 +90,9 @@ if ($cookie_consent != false) { ?>
     <div class="cookie-consent">
         <div class="cookie-consent__container">
             <p><?php echo $cookie_consent_text ?></p>
-            <button class="button-cookie" id="rcc-confirm-button" aria-label="Accept cookies">I understand</button>
+            <button class="button-cookie" id="rcc-confirm-button" aria-label="<?php echo esc_attr__( 'Accept cookies', 'affiliatepress' ); ?>">
+    <?php esc_html_e( 'I understand', 'affiliatepress' ); ?>
+</button>
         </div>
     </div>
 <?php }

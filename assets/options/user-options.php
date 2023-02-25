@@ -1,14 +1,14 @@
 <?php
 
 // for account owner
-add_action('show_user_profile', 'add_custom_user_profile_fields');
-add_action('personal_options_update', 'save_custom_user_profile_fields');
+add_action('show_user_profile', 'affiliatepress_add_custom_user_profile_fields');
+add_action('personal_options_update', 'affiliatepress_save_custom_user_profile_fields');
 
 // for admins
-add_action('edit_user_profile', 'add_custom_user_profile_fields');
-add_action('edit_user_profile_update', 'save_custom_user_profile_fields');
+add_action('edit_user_profile', 'affiliatepress_add_custom_user_profile_fields');
+add_action('edit_user_profile_update', 'affiliatepress_save_custom_user_profile_fields');
 
-function add_custom_user_profile_fields($user)
+function affiliatepress_add_custom_user_profile_fields($user)
 {
     wp_nonce_field('user_meta_edit', 'user_meta_edit_nonce');
 
@@ -28,7 +28,7 @@ function add_custom_user_profile_fields($user)
     );
 }
 
-function save_custom_user_profile_fields($user_id)
+function affiliatepress_save_custom_user_profile_fields($user_id)
 {
     if (!isset($_POST['user_meta_edit_nonce']) || !wp_verify_nonce($_POST['user_meta_edit_nonce'], 'user_meta_edit'))  exit;
 

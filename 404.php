@@ -16,9 +16,9 @@
                     <div class="latest-post__info">
                         <a class="latest-post__category" href="<?php echo get_category_link(get_the_category()[0]->term_id) ?>"><?php echo get_the_category()[0]->name ?></a>
                         <h2 class="latest-post__tile entry-title"><?php the_title() ?></h2>
-                        <p class="latest-post__excerpt entry-summary"><?php the_custom_excerpt() ?></p>
+                        <p class="latest-post__excerpt entry-summary"><?php affiliatepress_the_custom_excerpt() ?></p>
                         <div class="latest-post__data">
-                            <span>Updated <?php echo human_time_diff(get_the_updated_time("U")) ?> ago</span>
+                            <span>Updated <?php echo human_time_diff(affiliatepress_get_the_updated_time("U")) ?> ago</span>
                             <span class="latest-post__divider"> • </span>
                             <span>By <a class="latest-post__author" href="<?php echo get_author_posts_url(get_the_author_meta('ID')) ?>"><?php the_author() ?></a></span>
                         </div>

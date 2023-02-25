@@ -3,35 +3,35 @@
 if (!defined('ABSPATH')) exit;
 
 // WP 3.0+
-add_action('add_meta_boxes', 'post_options_metabox');
+add_action('add_meta_boxes', 'affiliatepress_post_options_metabox');
 
 // backwards compatible
-add_action('admin_init', 'post_options_metabox', 1);
+add_action('admin_init', 'affiliatepress_post_options_metabox', 1);
 
 /* Do something with the data entered */
-add_action('save_post', 'save_post_options');
+add_action('save_post', 'affiliatepress_save_post_options');
 
 /**
  *  Adds a box to the main column on the Post edit screen
  * 
  */
-function post_options_metabox()
+function affiliatepress_post_options_metabox()
 {
-    add_meta_box('post_options', __('Post Options' , 'affiliatepress'), 'post_options_code', 'post', 'normal', 'high');
+    add_meta_box('post_options', __('Post Options' , 'affiliatepress'), 'affiliatepress_post_options_code', 'post', 'normal', 'high');
 }
 
 /**
  *  Prints the box content
  */
 
-function post_options_code($post)
+function affiliatepress_post_options_code($post)
 {
     wp_nonce_field(plugin_basename(__FILE__), $post->post_type . '_post_options_noncename');
 
-    $visibility_comments = get_post_meta_default($post->ID, '_visibility_comments');
-    $visibility_featured_image = get_post_meta_default($post->ID, '_visibility_featured_image');
-    $visibility_title = get_post_meta_default($post->ID, '_visibility_title');
-    $sidebar_popular_posts = get_post_meta_default($post->ID, '_visibility_sidebar_popular_posts');
+    $visibility_comments = affiliatepress_get_post_meta_default($post->ID, '_visibility_comments');
+    $visibility_featured_image = affiliatepress_get_post_meta_default($post->ID, '_visibility_featured_image');
+    $visibility_title = affiliatepress_get_post_meta_default($post->ID, '_visibility_title');
+    $sidebar_popular_posts = affiliatepress_get_post_meta_default($post->ID, '_visibility_sidebar_popular_posts');
 ?>
 
     <div class="custom-meta-boxes">
@@ -103,7 +103,7 @@ function post_options_code($post)
 /** 
  * When the post is saved, saves our custom data 
  */
-function save_post_options($post_id)
+function affiliatepress_save_post_options($post_id)
 {
     // verify if this is an auto save routine. 
     // If it is our form has not been submitted, so we dont want to do anything

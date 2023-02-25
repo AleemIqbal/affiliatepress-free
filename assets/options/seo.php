@@ -3,28 +3,28 @@
 if (!defined('ABSPATH')) exit;
 
 // WP 3.0+
-add_action('add_meta_boxes', 'seo_metabox');
+add_action('add_meta_boxes', 'affiliatepress_seo_metabox');
 
 // backwards compatible
-add_action('admin_init', 'seo_metabox', 1);
+add_action('admin_init', 'affiliatepress_seo_metabox', 1);
 
 /* Do something with the data entered */
-add_action('save_post', 'save_seo');
+add_action('save_post', 'affiliatepress_save_seo');
 
 /**
  *  Adds a box to the main column on the Post edit screen
  * 
  */
-function seo_metabox()
+function affiliatepress_seo_metabox()
 {
-    add_meta_box('seo', __('SEO' , 'affiliatepress'), 'seo_code', 'post', 'normal', 'high');
+    add_meta_box('seo', __('SEO' , 'affiliatepress'), 'affiliatepress_seo_code', 'post', 'normal', 'high');
 }
 
 /**
  *  Prints the box content
  */
 
-function seo_code($post)
+function affiliatepress_seo_code($post)
 {
     wp_nonce_field(plugin_basename(__FILE__), $post->post_type . '_seo_noncename');
     $keyword_meta = get_post_meta($post->ID, '_keywords_meta', true) ? get_post_meta($post->ID, '_keywords_meta', true) : ""; ?>
@@ -57,7 +57,7 @@ function seo_code($post)
 /** 
  * When the post is saved, saves our custom data 
  */
-function save_seo($post_id)
+function affiliatepress_save_seo($post_id)
 {
     // verify if this is an auto save routine. 
     // If it is our form has not been submitted, so we dont want to do anything

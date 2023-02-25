@@ -1,20 +1,25 @@
 <?php
 
-function add_menu_locations()
+function affiliatepress_add_menu_locations()
 {
     register_nav_menu("primary_menu", "Primary Menu");
     register_nav_menu("footer_menu", "Footer Menu");
 }
 
-function basic_support()
+function affiliatepress_basic_support()
 {
     add_theme_support("custom-logo");
     add_theme_support("post-thumbnails");
     add_image_size("featured", 915, 9999999);
     add_image_size("mobile-featured", 450, 9999999);
 }
-
-function get_seo_title() {
+function load_jquery_from_cdn() {
+    if (!wp_script_is('jquery', 'enqueued')) {
+        wp_enqueue_script('jquery', get_template_directory_uri() . '/assets/js/jquery-3.6.3.min.js', array(), '3.6.0', true);
+    }
+}
+add_action('wp_enqueue_scripts', 'load_jquery_from_cdn');
+function affiliatepress_get_seo_title() {
     $seo_title = "";
     if (is_home()) {
         $seo_title = (get_bloginfo("name") . " - " . get_bloginfo("description"));
@@ -25,7 +30,7 @@ function get_seo_title() {
     }
     return $seo_title;
 }
-function get_seo_description()
+function affiliatepress_get_seo_description()
 {
     $seo_description = "";
     if (is_single()) {
@@ -33,7 +38,10 @@ function get_seo_description()
     } elseif (is_home()) {
         $seo_description = (get_post_meta(get_the_ID(), "_yoast_wpseo_metadesc", true) ?: get_the_excerpt());
     } elseif (is_category()) {
-        $seo_description = trim(preg_replace('/\s+/', ' ', wp_strip_all_tags(category_description())));
+        $category_description = category_description();
+        if (is_string($category_description)) {
+            $seo_description = trim(preg_replace('/\s+/', ' ', wp_strip_all_tags($category_description)));
+        }
     } elseif (is_author()) {
         $seo_description = get_the_author_meta('description');
     } elseif (is_page()) {
@@ -45,27 +53,27 @@ function get_seo_description()
     return $seo_description;
 }
 
-function get_my_custom_logo()
+function affiliatepress_get_my_custom_logo()
 {
     $logo = get_theme_mod('custom_logo');
     $image = wp_get_attachment_image_src($logo, 'full');
     return $image;
 }
 
-function add_seo()
+function affiliatepress_add_seo()
 {
-    echo '<title>' . get_seo_title() . '</title>';
-    if (!empty(get_seo_description())) echo '<meta name="description" content="' . get_seo_description()  . '" />';
+    echo '<title>' . affiliatepress_get_seo_title() . '</title>';
+    if (!empty(affiliatepress_get_seo_description())) echo '<meta name="description" content="' . affiliatepress_get_seo_description()  . '" />';
     if (is_single() && !empty(get_post_meta(get_the_ID(), "_keywords_meta", true))) echo '<meta name="keywords" content="' . get_post_meta(get_the_ID(), "_keywords_meta", true)  . '" />';
 }
 
-function get_my_avatar_url($author_id)
+function affiliatepress_get_my_avatar_url($author_id)
 {
 
     return get_user_meta($author_id, "custom_avatar_url", true) ?: get_avatar_url($author_id);
 }
 
-function custom_additional_styles()
+function affiliatepress_custom_additional_styles()
 {
     wp_dequeue_style('wp-block-library');
 
@@ -97,7 +105,7 @@ function custom_additional_styles()
     wp_enqueue_style("single", get_template_directory_uri() . '/assets/css/' . $post_type . '.min.css');
 }
 
-function custom_additional_scripts()
+function affiliatepress_custom_additional_scripts()
 {
     if (is_single()) {
         echo '<script defer src="' . get_stylesheet_directory_uri() . '/assets/js/single-custom-scripts.js' . '"></script>';
@@ -124,7 +132,7 @@ function get_my_dom()
     return $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
 }
 
-function get_elem_value($xpath, $elem_path, $doc_context)
+function affiliatepress_get_elem_value($xpath, $elem_path, $doc_context)
 {
     $elem =  $xpath->query($elem_path, $doc_context)[0];
     if (empty($elem)) {
@@ -134,7 +142,7 @@ function get_elem_value($xpath, $elem_path, $doc_context)
     }
 }
 
-function get_elem_attribute($xpath, $elem_path, $doc_context, $attribute)
+function affiliatepress_get_elem_attribute($xpath, $elem_path, $doc_context, $attribute)
 {
     $elem =  $xpath->query($elem_path, $doc_context)[0];
     if (empty($elem)) {
@@ -144,19 +152,19 @@ function get_elem_attribute($xpath, $elem_path, $doc_context, $attribute)
     }
 }
 
-function the_custom_excerpt()
+function affiliatepress_the_custom_excerpt()
 {
     global $post;
     echo wp_trim_words($post->post_content, 12, '...');
 }
 
-function get_the_updated_time($format = '')
+function affiliatepress_get_the_updated_time($format = '')
 {
     $_format = (!empty($format) ? $format : get_option('date_format'));
     return get_the_modified_date($_format);
 }
 
-function hasToc($tiers, $content)
+function affiliatepress_hasToc($tiers, $content)
 {
 
     $pattern = '/<h[2-' . $tiers . ']*([^>]*)>(.*?)<\/h([2-' . $tiers . '])>/';
@@ -170,15 +178,16 @@ function hasToc($tiers, $content)
     return $return;
 }
 
-function auto_id_headings($content)
-{
+function affiliatepress_auto_id_headings_callback($matches) {
+    if (!stripos($matches[0], 'id=')) {
+        $matches[0] = $matches[1] . $matches[2] . ' id="' . sanitize_title($matches[3]) . '">' . $matches[3] . $matches[4];
+    }
+    return $matches[0];
+}
+
+function affiliatepress_auto_id_headings($content) {
     if (is_single() || is_page()) {
-        $content = preg_replace_callback('/(\<h[2-3](.*?))\>(.*)(<\/h[2-3]>)/i', function ($matches) {
-            if (!stripos($matches[0], 'id=')) :
-                $matches[0] = $matches[1] . $matches[2] . ' id="' . sanitize_title($matches[3]) . '">' . $matches[3] . $matches[4];
-            endif;
-            return $matches[0];
-        }, $content);
+        $content = preg_replace_callback('/(\<h[2-3](.*?))\>(.*)(<\/h[2-3]>)/i', 'affiliatepress_auto_id_headings_callback', $content);
     }
 
     $content = str_replace("[related_box_img]", get_theme_mod("setting_related_box", ""), $content);
@@ -186,12 +195,12 @@ function auto_id_headings($content)
     return $content;
 }
 
-function the_svg($name)
+function affiliatepress_the_svg($name)
 {
-    echo get_the_svg($name);
+    echo affiliatepress_get_the_svg($name);
 }
 
-function get_the_svg($name)
+function affiliatepress_get_the_svg($name)
 {
     switch ($name):
         case "chevron_right":
@@ -319,7 +328,7 @@ function get_the_svg($name)
     endswitch;
 }
 
-function wpb_set_post_views($postID)
+function affiliatepress_wpb_set_post_views($postID)
 {
     $count_key = 'wpb_post_views_count';
     $count = get_post_meta($postID, $count_key, true);
@@ -333,18 +342,18 @@ function wpb_set_post_views($postID)
     }
 }
 
-function wps_deregister_styles()
+function affiliatepress_wps_deregister_styles()
 {
     wp_dequeue_style('wp-block-library');
 }
 
-function add_menu_atts($atts, $item, $args)
+function affiliatepress_add_menu_atts($atts, $item, $args)
 {
     $atts['property'] = 'url';
     return $atts;
 }
 
-function faq_schema()
+function affiliatepress_faq_schema()
 {
     $index = 1;
     $faqs_schema = "";
@@ -355,8 +364,8 @@ function faq_schema()
 
     $elem_faqs = $xpath->query('//div[contains(@class,"faqs")]//div[contains(@class,"faq")]');
     foreach ($elem_faqs as $elem_faq) {
-        $question = get_elem_value($xpath, './/p[contains(@class,"faq__question")]', $elem_faq);
-        $answer = get_elem_value($xpath, './/p[contains(@class,"faq__answer")]', $elem_faq);
+        $question = affiliatepress_get_elem_value($xpath, './/p[contains(@class,"faq__question")]', $elem_faq);
+        $answer = affiliatepress_get_elem_value($xpath, './/p[contains(@class,"faq__answer")]', $elem_faq);
         $faq = (object) array(
             "index" => $index,
             "question" => $question,
@@ -390,11 +399,11 @@ function faq_schema()
     }
 }
 
-function add_schema()
+function affiliatepress_add_schema()
 {
     $site_name = get_bloginfo("name");
     $home_url = home_url("/");
-    $image = get_my_custom_logo();
+    $image = affiliatepress_get_my_custom_logo();
     if (is_home()) { ?>
         <script type="application/ld+json">
             [{
@@ -403,15 +412,16 @@ function add_schema()
                 "@id": "#Organization",
                 "name": "<?php echo $site_name ?>",
                 "url": "<?php echo $home_url ?>"
-                <?php if ($image) echo ',"logo": { "@type": "ImageObject", "url": "' . $image[0] . '", "width": "' . $image[1] . '", "height": "' . $image[2] . '" }' ?>
+                <?php if ($image && is_array($image)) echo ',"logo": { "@type": "ImageObject", "url": "' . $image[0] . '", "width": "' . $image[1] . '", "height": "' . $image[2] . '" }' ?>
             }]
         </script>
     <?php
     } else if (is_single()) {
-        $seo_title = html_entity_decode(get_seo_title());
+        $seo_title = html_entity_decode(affiliatepress_get_seo_title());
         $author_id = get_post_field('post_author', get_queried_object_id());
         $post_link = get_the_permalink();
-        $featured_image = wp_get_attachment_image_src(get_post_thumbnail_id(), 'full'); ?>
+        $featured_image = wp_get_attachment_image_src(get_post_thumbnail_id(), 'full');
+        $image_url = !empty($featured_image) ? $featured_image[0] : ''; ?>
 
         <script type="application/ld+json">
             [{
@@ -423,10 +433,10 @@ function add_schema()
                     },
                     "headline": "<?php echo $seo_title ?>",
                     "image": [
-                        "<?php echo $featured_image[0] ?>"
+                        "<?php echo esc_url($image_url); ?>"
                     ],
                     "datePublished": "<?php echo get_the_date('c') ?>",
-                    "dateModified": "<?php echo get_the_updated_time('c') ?>",
+                    "dateModified": "<?php echo affiliatepress_get_the_updated_time('c') ?>",
                     "author": {
                         "@type": "Person",
                         "name": "<?php echo get_the_author_meta('display_name', $author_id); ?>"
@@ -434,33 +444,29 @@ function add_schema()
                     "publisher": {
                         "@type": "Organization",
                         "name": "<?php echo $site_name ?>",
-                        "logo": {
-                            "@type": "ImageObject",
-                            "url": "<?php echo $image[0] ?>",
-                            "caption": "<?php echo $site_name ?> logo"
-                        }
+                        <?php if ($image && is_array($image)) echo '"logo": { "@type": "ImageObject", "url": "' . $image[0] . '", "caption": "' . $site_name . ' logo" },' ?>
                     }
                 }
-                <?php echo faq_schema(); ?>
+                <?php echo affiliatepress_faq_schema(); ?>
             ]
         </script>
 <?php }
 }
 
-function social_meta()
+function affiliatepress_social_meta()
 {
     $twitter_handle = get_theme_mod("setting_twitter_handle", "");
     echo '<meta property="og:type" content="' . (is_home() ? "website" : "article") . '">';
     echo '<meta property="og:locale" content="en_US">';
-    echo '<meta property="og:title" content="' . get_seo_title() . '">';
-    echo '<meta property="og:description" content="' . get_seo_description() . '">';
+    echo '<meta property="og:title" content="' . affiliatepress_get_seo_title() . '">';
+    echo '<meta property="og:description" content="' . affiliatepress_get_seo_description() . '">';
     echo '<meta property="og:url" content="' . get_permalink() . '">';
     echo '<meta property="canonical" content="' . get_permalink() . '">';
     echo '<meta property="og:site_name" content="' . get_bloginfo("name") . '">';
     echo '<meta name="twitter:card" content="summary_large_image">';
     if (!empty($twitter_handle)) echo '<meta name="twitter:site" content="' . $twitter_handle . '">'; // Fix this add this option to theme settings
-    echo '<meta name="twitter:title" content="' . get_seo_title() . '">';
-    echo '<meta name="twitter:description" content="' . get_seo_description() . '">';
+    echo '<meta name="twitter:title" content="' . affiliatepress_get_seo_title() . '">';
+    echo '<meta name="twitter:description" content="' . affiliatepress_get_seo_description() . '">';
     if (is_single()) {
         $featured_image = wp_get_attachment_image_src(get_post_thumbnail_id(), 'full');
 
@@ -472,14 +478,14 @@ function social_meta()
         }
 
         echo '<meta property="article:published_time" content="' . get_the_time("c") . '">';
-        echo '<meta property="article:modified_time" content="' . get_the_updated_time("c") . '">';
+        echo '<meta property="article:modified_time" content="' . affiliatepress_get_the_updated_time("c") . '">';
     } else if (is_author()) {
-        echo '<meta property="og:image" content="' . get_my_avatar_url(get_the_author_meta("ID")) . '">';
+        echo '<meta property="og:image" content="' . affiliatepress_get_my_avatar_url(get_the_author_meta("ID")) . '">';
         echo '<meta property="og:image:width" content="96">';
         echo '<meta property="og:image:height" content="96">';
-        echo '<meta name="twitter:image:src" content="' . get_my_avatar_url(get_the_author_meta("ID")) . '">';
+        echo '<meta name="twitter:image:src" content="' . affiliatepress_get_my_avatar_url(get_the_author_meta("ID")) . '">';
     } else {
-        $custom_logo = get_my_custom_logo();
+        $custom_logo = affiliatepress_get_my_custom_logo();
         if ($custom_logo) {
             echo '<meta property="og:image" content="' . $custom_logo[0] . '">';
             echo '<meta property="og:image:width" content="' . $custom_logo[1] . '">';
@@ -489,7 +495,7 @@ function social_meta()
     }
 }
 
-function my_custom_customizer_settings($wp_customize)
+function affiliatepress_customizer_settings($wp_customize)
 {
     $wp_customize->add_panel('panel_post_settings', array(
         'title' => __('Post Settings', 'affiliatepress'),
@@ -717,14 +723,14 @@ function my_custom_customizer_settings($wp_customize)
     ));
 }
 
-function wp_head_data()
+function affiliatepress_wp_head_data()
 {
-    social_meta();
-    add_seo();
-    add_schema();
+    affiliatepress_social_meta();
+    affiliatepress_add_seo();
+    affiliatepress_add_schema();
 }
 
-function my_register_sidebars()
+function affiliatepress_my_register_sidebars()
 {
     register_sidebar(array(
         'id'            => 'primary',
@@ -737,12 +743,12 @@ function my_register_sidebars()
     ));
 }
 
-function get_post_meta_default($postID, $key)
+function affiliatepress_get_post_meta_default($postID, $key)
 {
     return get_post_meta($postID, $key, true) ?: "default";
 }
 
-function before_page_layout()
+function affiliatepress_before_page_layout()
 {
     $page_sidebar = get_theme_mod("setting_page_sidebar", false);
     if ($page_sidebar != false && is_page()) {
@@ -751,7 +757,7 @@ function before_page_layout()
     }
 }
 
-function after_page_layout()
+function affiliatepress_after_page_layout()
 {
     $page_sidebar = get_theme_mod("setting_page_sidebar", false);
     if ($page_sidebar != false && is_page()) {
@@ -761,35 +767,34 @@ function after_page_layout()
     }
 };
 
-add_action('before_page', 'before_page_layout', 0, 0);
+add_action('before_page', 'affiliatepress_before_page_layout', 0, 0);
 
-add_action('after_page', 'after_page_layout', 0, 0);
+add_action('after_page', 'affiliatepress_after_page_layout', 0, 0);
 
-add_action('widgets_init', 'my_register_sidebars');
+add_action('widgets_init', 'affiliatepress_my_register_sidebars');
 
-add_action("wp_head", "wp_head_data");
+add_action("wp_head", "affiliatepress_wp_head_data");
 
-add_action('customize_register', 'my_custom_customizer_settings');
+add_action('customize_register', 'affiliatepress_customizer_settings');
 
-add_filter('nav_menu_link_attributes', 'add_menu_atts', 10, 3);
+add_filter('nav_menu_link_attributes', 'affiliatepress_add_menu_atts', 10, 3);
 
-add_filter('the_content', 'auto_id_headings');
+add_filter('the_content', 'affiliatepress_auto_id_headings');
 
-add_action("wp_enqueue_scripts", "custom_additional_styles");
+add_action("wp_enqueue_scripts", "affiliatepress_custom_additional_styles");
 
-add_action('after_setup_theme', 'basic_support');
+add_action('after_setup_theme', 'affiliatepress_basic_support');
 
-add_action("init", "add_menu_locations");
+add_action("init", "affiliatepress_add_menu_locations");
 
-add_action('wp_footer', 'custom_additional_scripts');
+add_action('wp_footer', 'affiliatepress_custom_additional_scripts');
 
 add_theme_support( 'automatic-feed-links' );
 add_theme_support( "title-tag" );
 add_theme_support( "wp-block-styles" );
 add_theme_support( "responsive-embeds" );
-add_theme_support( "html5", $args );
-add_theme_support( "custom-header", $args );
-add_theme_support( "custom-background", $args );
+add_theme_support( 'html5', array( 'search-form', 'comment-form', 'comment-list', 'gallery', 'caption', 'style', 'script' ) );
+add_theme_support( 'custom-background' );
 add_theme_support( "align-wide" );
 add_action('wp_enqueue_scripts', function() {
     if (is_singular() && comments_open() && get_option('thread_comments')) {

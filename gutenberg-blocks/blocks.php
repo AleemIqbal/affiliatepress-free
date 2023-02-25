@@ -2,7 +2,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-function my_custom_block_editor_assets()
+function affiliatepress_block_editor_assets()
 {
     $url = get_template_directory_uri() . "/gutenberg-blocks/";
 
@@ -10,7 +10,7 @@ function my_custom_block_editor_assets()
 
     // Scripts.
     wp_enqueue_script(
-        'my-custom-block-js', // Handle.
+        'affiliatepress-block-js', // Handle.
         $url . 'build/index.js',
         $asset_file['dependencies'],
         $asset_file["version"]
@@ -18,19 +18,19 @@ function my_custom_block_editor_assets()
 
     // Styles.
     wp_enqueue_style(
-        'my-custom-block-editor-css', // Handle.
+        'affiliatepress-block-editor-css', // Handle.
         $url . 'build/editor.css',
         array('wp-edit-blocks')
     );
 }
 
-add_action('enqueue_block_editor_assets', 'my_custom_block_editor_assets');
+add_action('enqueue_block_editor_assets', 'affiliatepress_block_editor_assets');
 
-function my_custom_block_assets()
+function affiliatepress_block_assets()
 {
     $url = get_template_directory_uri() . "/gutenberg-blocks/";
 
     echo '<link rel="stylesheet" href="' . $url . 'build/style.css' . '" type="text/css" media="print" onload="this.media=`all`" />';
 }
 
-add_action('enqueue_block_assets', 'my_custom_block_assets');
+add_action('enqueue_block_assets', 'affiliatepress_block_assets');

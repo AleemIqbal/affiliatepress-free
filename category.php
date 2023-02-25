@@ -9,14 +9,14 @@
             <?php the_post_thumbnail('full', ["alt" => get_the_title(), 'class' => "post-box__img"]) ?>
             <a class="post-box__category" href="<?php echo get_category_link(get_the_category()[0]->term_id) ?>"><?php echo get_the_category()[0]->name ?></a>
             <h2 class="post-box__tile entry-title"><?php the_title() ?></h2>
-            <p class="post-box__excerpt entry-summary"><?php the_custom_excerpt() ?></p>
+            <p class="post-box__excerpt entry-summary"><?php affiliatepress_the_custom_excerpt() ?></p>
             <div class="post-box__info">
                 <div class="post-box__info__half vcard author">By
                     <a class="url fn" href="<?php echo get_author_posts_url(get_the_author_meta('ID')) ?>"><?php the_author() ?></a>
                 </div>
                 <span class="post-box_info__divider"> • </span>
                 <div class="post-box__info__half date">
-                    <time class="updated">Updated <?php echo human_time_diff(get_the_updated_time("U")) ?> ago</time>
+                    <time class="updated">Updated <?php echo human_time_diff(affiliatepress_get_the_updated_time("U")) ?> ago</time>
                     <time class="published"><?php echo get_the_date() ?></time>
                 </div>
             </div>

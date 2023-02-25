@@ -87,3 +87,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
   CookieAlert();
 });
+
+(function($) {
+  $(document).ready(function() {
+    // Add keyboard navigation to all menu items
+    $('.menu-item a').on('keydown', function(e) {
+      if (e.keyCode === 13 || e.keyCode === 32) { // Enter or space key
+        $(this).trigger('click');
+      }
+    });
+
+    // Add keyboard navigation to all form fields
+    $('input, select, textarea').on('keydown', function(e) {
+      if (e.keyCode === 13) { // Enter key
+        $(this).trigger('blur');
+        $(this).next().focus();
+        return false;
+      }
+    });
+
+        // Add visual focus highlighting to all focusable elements
+        $('a, button, input, textarea, select, [tabindex]').on({
+          focus: function() {
+            $(this).addClass('focus');
+          },
+          keydown: function(e) {
+            if (e.keyCode === 9) { // Tab key
+              $(this).addClass('focus');
+            }
+          }
+        });
+      });
+    })(jQuery);
